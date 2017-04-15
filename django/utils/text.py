@@ -38,8 +38,6 @@ def wrap(text, width):
     Don't wrap long words, thus the output text may have lines longer than
     ``width``.
     """
-    text = force_text(text)
-
     def _generator():
         for line in text.splitlines(True):  # True keeps trailing linebreaks
             max_width = min((line.endswith('\n') and width + 1 or width), width)
@@ -71,7 +69,6 @@ class Truncator(SimpleLazyObject):
             truncate = pgettext(
                 'String to return when truncating text',
                 '%(truncated_text)s...')
-        truncate = force_text(truncate)
         if '%(truncated_text)s' in truncate:
             return truncate % {'truncated_text': text}
         # The truncation text didn't contain the %(truncated_text)s string
@@ -415,9 +412,8 @@ def slugify(value, allow_unicode=False):
     value = force_text(value)
     if allow_unicode:
         value = unicodedata.normalize('NFKC', value)
-        value = re.sub(r'[^\w\s-]', '', value).strip().lower()
-        return mark_safe(re.sub(r'[-\s]+', '-', value))
-    value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
+    else:
+        value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
     value = re.sub(r'[^\w\s-]', '', value).strip().lower()
     return mark_safe(re.sub(r'[-\s]+', '-', value))
 
